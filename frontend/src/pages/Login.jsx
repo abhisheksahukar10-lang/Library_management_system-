@@ -61,12 +61,12 @@ function Login({ onLogin }) {
               <div className="role-card" onClick={() => selectMode('STUDENT')}>
                 <div className="role-icon">🎓</div>
                 <div className="role-name">Student</div>
-                <div className="role-desc">Borrow up to 3 books</div>
+                
               </div>
               <div className="role-card" onClick={() => selectMode('FACULTY')}>
                 <div className="role-icon">👨‍🏫</div>
                 <div className="role-name">Professor</div>
-                <div className="role-desc">Borrow up to 10 books</div>
+            
               </div>
             </div>
           </>
