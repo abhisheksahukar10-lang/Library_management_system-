@@ -1,5 +1,6 @@
 package com.library.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,18 +8,17 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 /**
- * Records every borrowing event: who borrowed which copy, when, and for how long.
+ * Records every borrowing event:
+ * who borrowed which copy, when, and for how long.
  *
- * Problem statement: "Entry of all the book will be done, who borrows that
- * book and when and also duration."
- *
- * OOP CONCEPT: ASSOCIATION — links User and BookCopy (many-to-many concept
- * handled via a join entity).
+ * OOP CONCEPT:
+ * ASSOCIATION → links User and BookCopy.
  */
 @Entity
 @Table(name = "borrow_transactions")
 @Data
 @NoArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class BorrowTransaction {
 
     @Id
@@ -26,17 +26,22 @@ public class BorrowTransaction {
     private Long id;
 
     /**
-     * Who borrowed the book (Student or Faculty — polymorphism).
-     * At runtime, this could be a Student or Faculty object.
+     * FIX:
+     * Changed LAZY -> EAGER
+     * Prevents Hibernate proxy serialization issue.
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User borrower;
 
     /**
-     * Which specific physical copy was borrowed.
+     * FIX:
+     * Changed LAZY -> EAGER
+     * Prevents serialization failure:
+     *
+     * BorrowTransaction -> BookCopy -> Book
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "book_copy_id", nullable = false)
     private BookCopy bookCopy;
 
@@ -46,27 +51,32 @@ public class BorrowTransaction {
     @Column(nullable = false)
     private LocalDate dueDate;
 
-    private LocalDate returnDate;   // null means not yet returned
+    /**
+     * null = not returned yet
+     */
+    private LocalDate returnDate;
 
     @Column(nullable = false)
     private boolean returned = false;
 
     /**
-     * For restricted (in-library-only) books, this is the time borrowed in hours.
-     * For regular books this is 0 (not applicable).
+     * For in-library-only books.
      */
     private int inLibraryHours = 0;
 
     /**
-     * Fine linked to this transaction (if book was returned late).
-     * OOP CONCEPT: COMPOSITION — transaction "has-a" fine.
+     * One transaction can have one fine.
      */
     @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
     private Fine fine;
 
     // Convenience constructor
-    public BorrowTransaction(User borrower, BookCopy bookCopy,
-                              LocalDate borrowDate, LocalDate dueDate) {
+    public BorrowTransaction(
+            User borrower,
+            BookCopy bookCopy,
+            LocalDate borrowDate,
+            LocalDate dueDate
+    ) {
         this.borrower = borrower;
         this.bookCopy = bookCopy;
         this.borrowDate = borrowDate;
@@ -75,7 +85,7 @@ public class BorrowTransaction {
     }
 
     /**
-     * Check if this transaction is overdue right now.
+     * Check overdue status.
      */
     public boolean isOverdue() {
         if (returned) return false;
@@ -83,10 +93,12 @@ public class BorrowTransaction {
     }
 
     /**
-     * How many days overdue (0 if not overdue).
+     * Calculate overdue days.
      */
     public long getOverdueDays() {
         if (!isOverdue()) return 0;
-        return java.time.temporal.ChronoUnit.DAYS.between(dueDate, LocalDate.now());
+
+        return java.time.temporal.ChronoUnit.DAYS
+                .between(dueDate, LocalDate.now());
     }
 }
