@@ -1,27 +1,37 @@
 // src/pages/StudentDashboard.jsx
 import React, { useEffect, useState } from 'react';
-import { getActiveBorrows, getUserBorrows, getUnpaidFines, payFine, getBooks, searchBooks } from '../services/api';
+import { getUserBorrows, getUnpaidFines, payFine, getBooks, searchBooks } from '../services/api';
 
-/**
- * Personal dashboard for Students.
- * Shows: borrow policy, active borrows, unpaid fines, book search.
- */
 function StudentDashboard({ user }) {
   const [borrows,  setBorrows]  = useState([]);
   const [fines,    setFines]    = useState([]);
   const [books,    setBooks]    = useState([]);
   const [search,   setSearch]   = useState('');
   const [msg,      setMsg]      = useState({ text: '', type: '' });
-  const [tab,      setTab]      = useState('borrows'); // borrows | fines | books
+  const [loadErr,  setLoadErr]  = useState('');   // FIX: show load errors
+  const [tab,      setTab]      = useState('borrows');
 
-  useEffect(() => {
-    loadAll();
-  }, [user.id]);
+  useEffect(() => { loadAll(); }, [user.id]);
 
   const loadAll = () => {
-    getUserBorrows(user.id).then(r => setBorrows(r.data)).catch(() => {});
-    getUnpaidFines(user.id).then(r => setFines(r.data)).catch(() => {});
-    getBooks().then(r => setBooks(r.data)).catch(() => {});
+    setLoadErr('');
+
+    // FIX: was .catch(() => {}) — silently swallowed HTTP 500 errors.
+    // Now shows the actual error so you can debug it.
+    getUserBorrows(user.id)
+      .then(r => setBorrows(r.data))
+      .catch(err => {
+        console.error('Failed to load borrows:', err);
+        setLoadErr('Could not load borrows. Check the browser console for details.');
+      });
+
+    getUnpaidFines(user.id)
+      .then(r => setFines(r.data))
+      .catch(err => console.error('Failed to load fines:', err));
+
+    getBooks()
+      .then(r => setBooks(r.data))
+      .catch(err => console.error('Failed to load books:', err));
   };
 
   const handleSearch = () => {
@@ -35,7 +45,7 @@ function StudentDashboard({ user }) {
       .catch(err => setMsg({ text: err.response?.data || 'Payment failed.', type: 'error' }));
   };
 
-  const isOverdue = (d) => d && new Date(d) < new Date();
+  const isOverdue      = (d)  => d && new Date(d) < new Date();
   const activeBorrows  = borrows.filter(b => !b.returned);
   const totalFineOwed  = fines.reduce((s, f) => s + f.totalAmount, 0);
 
@@ -52,7 +62,9 @@ function StudentDashboard({ user }) {
           </div>
           <div style={{ display: 'flex', gap: '20px' }}>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#2c5282' }}>{activeBorrows.length}/3</div>
+              <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#2c5282' }}>
+                {activeBorrows.length}/3
+              </div>
               <div style={{ fontSize: '0.85rem', color: '#4a5568' }}>Books Borrowed</div>
             </div>
             <div style={{ textAlign: 'center' }}>
@@ -72,17 +84,36 @@ function StudentDashboard({ user }) {
         </div>
       </div>
 
-      {msg.text && <div className={`alert ${msg.type === 'error' ? 'alert-error' : 'alert-success'}`}>{msg.text}</div>}
+      {/* Error / success messages */}
+      {loadErr && (
+        <div className="alert alert-error">
+          ⚠️ {loadErr}
+        </div>
+      )}
+      {msg.text && (
+        <div className={`alert ${msg.type === 'error' ? 'alert-error' : 'alert-success'}`}>
+          {msg.text}
+        </div>
+      )}
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
-        {[['borrows', `📤 My Borrows (${activeBorrows.length} active)`],
+        {[
+          ['borrows', `📤 My Borrows (${activeBorrows.length} active)`],
           ['fines',   `💶 My Fines (${fines.length} unpaid)`],
-          ['books',   '📖 Browse Books']].map(([key, label]) => (
-          <button key={key} className={`btn ${tab === key ? 'btn-primary' : ''}`}
+          ['books',   '📖 Browse Books']
+        ].map(([key, label]) => (
+          <button key={key}
+            className={`btn ${tab === key ? 'btn-primary' : ''}`}
             style={tab !== key ? { background: '#e2e8f0' } : {}}
-            onClick={() => setTab(key)}>{label}</button>
+            onClick={() => setTab(key)}>
+            {label}
+          </button>
         ))}
+        <button className="btn btn-sm" style={{ marginLeft: 'auto', background: '#e2e8f0' }}
+          onClick={loadAll} title="Refresh data">
+          🔄 Refresh
+        </button>
       </div>
 
       {/* ── My Borrows ── */}
@@ -90,28 +121,36 @@ function StudentDashboard({ user }) {
         <div className="card" style={{ padding: 0 }}>
           <table>
             <thead>
-              <tr><th>Book</th><th>Copy</th><th>Borrowed</th><th>Due Date</th><th>Status</th></tr>
+              <tr>
+                <th>Book</th>
+                <th>Copy Code</th>
+                <th>Borrowed On</th>
+                <th>Due Date</th>
+                <th>Status</th>
+              </tr>
             </thead>
             <tbody>
               {borrows.map(t => (
                 <tr key={t.id}>
                   <td><strong>{t.bookCopy?.book?.title || '—'}</strong></td>
-                  <td><code style={{ fontSize: '0.82rem' }}>{t.bookCopy?.copyCode}</code></td>
+                  <td><code style={{ fontSize: '0.82rem' }}>{t.bookCopy?.copyCode || '—'}</code></td>
                   <td>{t.borrowDate}</td>
                   <td style={{ color: !t.returned && isOverdue(t.dueDate) ? '#e53e3e' : 'inherit' }}>
-                    {t.dueDate}{!t.returned && isOverdue(t.dueDate) && ' ⚠️'}
+                    {t.dueDate}
+                    {!t.returned && isOverdue(t.dueDate) && ' ⚠️'}
                   </td>
                   <td>
                     {t.returned
-                      ? <span className="badge badge-green">Returned</span>
+                      ? <span className="badge badge-green">Returned {t.returnDate}</span>
                       : isOverdue(t.dueDate)
                         ? <span className="badge badge-red">Overdue</span>
-                        : <span className="badge badge-yellow">Active</span>}
+                        : <span className="badge badge-yellow">Active</span>
+                    }
                   </td>
                 </tr>
               ))}
-              {borrows.length === 0 && (
-                <tr><td colSpan={5} style={{ textAlign:'center', color:'#718096', padding:'24px' }}>
+              {borrows.length === 0 && !loadErr && (
+                <tr><td colSpan={5} style={{ textAlign: 'center', color: '#718096', padding: '24px' }}>
                   No borrow history yet.
                 </td></tr>
               )}
@@ -131,7 +170,11 @@ function StudentDashboard({ user }) {
           <div className="card" style={{ padding: 0 }}>
             <table>
               <thead>
-                <tr><th>Fine ID</th><th>Overdue Days</th><th>Rate</th><th>Total (€)</th><th>Date</th><th>Action</th></tr>
+                <tr>
+                  <th>Fine ID</th><th>Overdue Days</th>
+                  <th>Rate</th><th>Total (€)</th>
+                  <th>Date</th><th>Action</th>
+                </tr>
               </thead>
               <tbody>
                 {fines.map(f => (
@@ -142,12 +185,14 @@ function StudentDashboard({ user }) {
                     <td><strong>€{f.totalAmount.toFixed(2)}</strong></td>
                     <td>{f.fineDate}</td>
                     <td>
-                      <button className="btn btn-success btn-sm" onClick={() => handlePay(f.id)}>Pay Now</button>
+                      <button className="btn btn-success btn-sm" onClick={() => handlePay(f.id)}>
+                        Pay Now
+                      </button>
                     </td>
                   </tr>
                 ))}
                 {fines.length === 0 && (
-                  <tr><td colSpan={6} style={{ textAlign:'center', color:'#718096', padding:'24px' }}>
+                  <tr><td colSpan={6} style={{ textAlign: 'center', color: '#718096', padding: '24px' }}>
                     🎉 No unpaid fines!
                   </td></tr>
                 )}
@@ -166,7 +211,9 @@ function StudentDashboard({ user }) {
               onKeyDown={e => e.key === 'Enter' && handleSearch()} />
             <button className="btn btn-primary" onClick={handleSearch}>Search</button>
             <button className="btn" style={{ background: '#e2e8f0' }}
-              onClick={() => { setSearch(''); getBooks().then(r => setBooks(r.data)); }}>Reset</button>
+              onClick={() => { setSearch(''); getBooks().then(r => setBooks(r.data)); }}>
+              Reset
+            </button>
           </div>
           <div className="card" style={{ padding: 0 }}>
             <table>
@@ -188,7 +235,9 @@ function StudentDashboard({ user }) {
                   </tr>
                 ))}
                 {books.length === 0 && (
-                  <tr><td colSpan={5} style={{ textAlign:'center', color:'#718096', padding:'24px' }}>No books found.</td></tr>
+                  <tr><td colSpan={5} style={{ textAlign: 'center', color: '#718096', padding: '24px' }}>
+                    No books found.
+                  </td></tr>
                 )}
               </tbody>
             </table>
