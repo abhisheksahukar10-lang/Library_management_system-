@@ -1,0 +1,31 @@
+# Maven
+target/
+*.class
+
+# Node
+node_modules/
+build/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Env
+.env
+
+# IntelliJ
+.idea/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# Mac
+.DS_Store
