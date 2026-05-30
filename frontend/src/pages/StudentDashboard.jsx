@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // src/pages/StudentDashboard.jsx  — v4: Borrow + Pre-borrow + History + Fines
 import React, { useEffect, useState } from 'react';
 import {
@@ -18,25 +17,10 @@ function StudentDashboard({ user }) {
   const [msg,         setMsg]         = useState({ text: '', type: '' });
   const [tab,         setTab]         = useState('borrows');
   const [loadingBook, setLoadingBook] = useState(null); // bookId being acted on
-=======
-// src/pages/StudentDashboard.jsx
-import React, { useEffect, useState } from 'react';
-import { getUserBorrows, getUnpaidFines, payFine, getBooks, searchBooks } from '../services/api';
-
-function StudentDashboard({ user }) {
-  const [borrows,  setBorrows]  = useState([]);
-  const [fines,    setFines]    = useState([]);
-  const [books,    setBooks]    = useState([]);
-  const [search,   setSearch]   = useState('');
-  const [msg,      setMsg]      = useState({ text: '', type: '' });
-  const [loadErr,  setLoadErr]  = useState('');   // FIX: show load errors
-  const [tab,      setTab]      = useState('borrows');
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
 
   useEffect(() => { loadAll(); }, [user.id]);
 
   const loadAll = () => {
-<<<<<<< HEAD
     getUserBorrows(user.id).then(r => setBorrows(r.data)).catch(() => {});
     getUnpaidFines(user.id).then(r => setUnpaidFines(r.data)).catch(() => {});
     getAllUserFines(user.id).then(r => setAllFines(r.data)).catch(() => {});
@@ -47,26 +31,6 @@ function StudentDashboard({ user }) {
   const flash = (text, type = 'success') => {
     setMsg({ text, type });
     setTimeout(() => setMsg({ text: '', type: '' }), 4000);
-=======
-    setLoadErr('');
-
-    // FIX: was .catch(() => {}) — silently swallowed HTTP 500 errors.
-    // Now shows the actual error so you can debug it.
-    getUserBorrows(user.id)
-      .then(r => setBorrows(r.data))
-      .catch(err => {
-        console.error('Failed to load borrows:', err);
-        setLoadErr('Could not load borrows. Check the browser console for details.');
-      });
-
-    getUnpaidFines(user.id)
-      .then(r => setFines(r.data))
-      .catch(err => console.error('Failed to load fines:', err));
-
-    getBooks()
-      .then(r => setBooks(r.data))
-      .catch(err => console.error('Failed to load books:', err));
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
   };
 
   const handleSearch = () => {
@@ -74,7 +38,6 @@ function StudentDashboard({ user }) {
     searchBooks({ title: search }).then(r => setBooks(r.data)).catch(() => {});
   };
 
-<<<<<<< HEAD
   const handleBorrow = async (bookId) => {
     setLoadingBook(bookId);
     try {
@@ -158,24 +121,12 @@ function StudentDashboard({ user }) {
     ['fines',     `💶 Fines (${unpaidFines.length} unpaid)`],
     ['books',     '📖 Browse & Borrow'],
   ];
-=======
-  const handlePay = (fineId) => {
-    payFine(fineId)
-      .then(() => { setMsg({ text: '✅ Fine paid!', type: 'success' }); loadAll(); })
-      .catch(err => setMsg({ text: err.response?.data || 'Payment failed.', type: 'error' }));
-  };
-
-  const isOverdue      = (d)  => d && new Date(d) < new Date();
-  const activeBorrows  = borrows.filter(b => !b.returned);
-  const totalFineOwed  = fines.reduce((s, f) => s + f.totalAmount, 0);
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
 
   return (
     <div>
       <h1 className="page-title">🎓 Student Dashboard</h1>
 
       {/* Welcome card */}
-<<<<<<< HEAD
       <div className="card" style={{ background: 'linear-gradient(135deg,#ebf8ff 0%,#bee3f8 100%)', border: '1px solid #90cdf4', marginBottom: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <div>
@@ -197,31 +148,6 @@ function StudentDashboard({ user }) {
         </div>
         <div style={{ marginTop: '14px', background: 'white', borderRadius: '8px', padding: '10px 14px',
                       display: 'flex', gap: '20px', flexWrap: 'wrap', fontSize: '0.88rem' }}>
-=======
-      <div className="card" style={{ background: 'linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%)', border: '1px solid #90cdf4' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-          <div>
-            <h2 style={{ color: '#1a365d', marginBottom: '4px' }}>Welcome, {user.name}! 👋</h2>
-            <p style={{ color: '#4a5568' }}>{user.email}</p>
-          </div>
-          <div style={{ display: 'flex', gap: '20px' }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#2c5282' }}>
-                {activeBorrows.length}/3
-              </div>
-              <div style={{ fontSize: '0.85rem', color: '#4a5568' }}>Books Borrowed</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '1.8rem', fontWeight: 700, color: fines.length ? '#c53030' : '#38a169' }}>
-                €{totalFineOwed.toFixed(2)}
-              </div>
-              <div style={{ fontSize: '0.85rem', color: '#4a5568' }}>Fines Due</div>
-            </div>
-          </div>
-        </div>
-        <div style={{ marginTop: '14px', background: 'white', borderRadius: '8px', padding: '12px',
-                      display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
           <span>📚 Max: <strong>3 books</strong></span>
           <span>📅 Duration: <strong>14 days</strong></span>
           <span>💶 Fine: <strong>€1.00/day</strong></span>
@@ -229,26 +155,14 @@ function StudentDashboard({ user }) {
         </div>
       </div>
 
-<<<<<<< HEAD
       {msg.text && (
         <div className={`alert ${msg.type === 'error' ? 'alert-error' : 'alert-success'}`}
              style={{ marginBottom: '16px' }}>
-=======
-      {/* Error / success messages */}
-      {loadErr && (
-        <div className="alert alert-error">
-          ⚠️ {loadErr}
-        </div>
-      )}
-      {msg.text && (
-        <div className={`alert ${msg.type === 'error' ? 'alert-error' : 'alert-success'}`}>
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
           {msg.text}
         </div>
       )}
 
       {/* Tabs */}
-<<<<<<< HEAD
       <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
         {tabs.map(([key, label]) => (
           <button key={key} className={`btn ${tab === key ? 'btn-primary' : ''}`}
@@ -258,33 +172,10 @@ function StudentDashboard({ user }) {
       </div>
 
       {/* ── ACTIVE BORROWS ── */}
-=======
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
-        {[
-          ['borrows', `📤 My Borrows (${activeBorrows.length} active)`],
-          ['fines',   `💶 My Fines (${fines.length} unpaid)`],
-          ['books',   '📖 Browse Books']
-        ].map(([key, label]) => (
-          <button key={key}
-            className={`btn ${tab === key ? 'btn-primary' : ''}`}
-            style={tab !== key ? { background: '#e2e8f0' } : {}}
-            onClick={() => setTab(key)}>
-            {label}
-          </button>
-        ))}
-        <button className="btn btn-sm" style={{ marginLeft: 'auto', background: '#e2e8f0' }}
-          onClick={loadAll} title="Refresh data">
-          🔄 Refresh
-        </button>
-      </div>
-
-      {/* ── My Borrows ── */}
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
       {tab === 'borrows' && (
         <div className="card" style={{ padding: 0 }}>
           <table>
             <thead>
-<<<<<<< HEAD
               <tr><th>Book</th><th>Copy Code</th><th>Borrowed On</th><th>Due Date</th><th>Status</th></tr>
             </thead>
             <tbody>
@@ -310,47 +201,11 @@ function StudentDashboard({ user }) {
                   </td>
                 </tr>
               ))}
-=======
-              <tr>
-                <th>Book</th>
-                <th>Copy Code</th>
-                <th>Borrowed On</th>
-                <th>Due Date</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {borrows.map(t => (
-                <tr key={t.id}>
-                  <td><strong>{t.bookCopy?.book?.title || '—'}</strong></td>
-                  <td><code style={{ fontSize: '0.82rem' }}>{t.bookCopy?.copyCode || '—'}</code></td>
-                  <td>{t.borrowDate}</td>
-                  <td style={{ color: !t.returned && isOverdue(t.dueDate) ? '#e53e3e' : 'inherit' }}>
-                    {t.dueDate}
-                    {!t.returned && isOverdue(t.dueDate) && ' ⚠️'}
-                  </td>
-                  <td>
-                    {t.returned
-                      ? <span className="badge badge-green">Returned {t.returnDate}</span>
-                      : isOverdue(t.dueDate)
-                        ? <span className="badge badge-red">Overdue</span>
-                        : <span className="badge badge-yellow">Active</span>
-                    }
-                  </td>
-                </tr>
-              ))}
-              {borrows.length === 0 && !loadErr && (
-                <tr><td colSpan={5} style={{ textAlign: 'center', color: '#718096', padding: '24px' }}>
-                  No borrow history yet.
-                </td></tr>
-              )}
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
             </tbody>
           </table>
         </div>
       )}
 
-<<<<<<< HEAD
       {/* ── RESERVATIONS ── */}
       {tab === 'reserves' && (
         <>
@@ -455,20 +310,11 @@ function StudentDashboard({ user }) {
             <div className="alert alert-error" style={{ marginBottom: '12px' }}>
               ⚠️ You have <strong>{unpaidFines.length}</strong> unpaid fine(s) — total:
               <strong> €{totalUnpaid.toFixed(2)}</strong>. Pay to unlock borrowing.
-=======
-      {/* ── My Fines ── */}
-      {tab === 'fines' && (
-        <>
-          {fines.length > 0 && (
-            <div className="alert alert-error">
-              ⚠️ You have {fines.length} unpaid fine(s) — total: <strong>€{totalFineOwed.toFixed(2)}</strong>. Pay to unlock borrowing.
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
             </div>
           )}
           <div className="card" style={{ padding: 0 }}>
             <table>
               <thead>
-<<<<<<< HEAD
                 <tr><th>Book</th><th>Overdue Days</th><th>Rate/Day</th><th>Total (€)</th><th>Date</th><th>Status</th><th>Action</th></tr>
               </thead>
               <tbody>
@@ -498,45 +344,13 @@ function StudentDashboard({ user }) {
                     </td>
                   </tr>
                 ))}
-=======
-                <tr>
-                  <th>Fine ID</th><th>Overdue Days</th>
-                  <th>Rate</th><th>Total (€)</th>
-                  <th>Date</th><th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {fines.map(f => (
-                  <tr key={f.id}>
-                    <td>{f.id}</td>
-                    <td>{f.overdueDays} days</td>
-                    <td>€{f.fineAmountPerDay}</td>
-                    <td><strong>€{f.totalAmount.toFixed(2)}</strong></td>
-                    <td>{f.fineDate}</td>
-                    <td>
-                      <button className="btn btn-success btn-sm" onClick={() => handlePay(f.id)}>
-                        Pay Now
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {fines.length === 0 && (
-                  <tr><td colSpan={6} style={{ textAlign: 'center', color: '#718096', padding: '24px' }}>
-                    🎉 No unpaid fines!
-                  </td></tr>
-                )}
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
               </tbody>
             </table>
           </div>
         </>
       )}
 
-<<<<<<< HEAD
       {/* ── BROWSE & BORROW ── */}
-=======
-      {/* ── Browse Books ── */}
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
       {tab === 'books' && (
         <>
           <div className="search-bar">
@@ -552,7 +366,6 @@ function StudentDashboard({ user }) {
           <div className="card" style={{ padding: 0 }}>
             <table>
               <thead>
-<<<<<<< HEAD
                 <tr><th>Title</th><th>Author</th><th>Genre</th><th>Year</th><th>Type</th><th>Action</th></tr>
               </thead>
               <tbody>
@@ -611,40 +424,10 @@ function StudentDashboard({ user }) {
             <strong> Reserve</strong> joins the waiting list if no copies are free —
             you'll be notified when one is ready.
           </p>
-=======
-                <tr><th>Title</th><th>Author</th><th>Genre</th><th>Year</th><th>Type</th></tr>
-              </thead>
-              <tbody>
-                {books.map(b => (
-                  <tr key={b.id}>
-                    <td><strong>{b.title}</strong></td>
-                    <td>{b.author}</td>
-                    <td>{b.genre || '—'}</td>
-                    <td>{b.publishedYear || '—'}</td>
-                    <td>
-                      {b.restrictedFromRemoval
-                        ? <span className="badge badge-red">In-Library</span>
-                        : <span className="badge badge-green">Can Borrow</span>}
-                    </td>
-                  </tr>
-                ))}
-                {books.length === 0 && (
-                  <tr><td colSpan={5} style={{ textAlign: 'center', color: '#718096', padding: '24px' }}>
-                    No books found.
-                  </td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
         </>
       )}
     </div>
   );
 }
 
-<<<<<<< HEAD
 export default StudentDashboard;
-=======
-export default StudentDashboard;
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d

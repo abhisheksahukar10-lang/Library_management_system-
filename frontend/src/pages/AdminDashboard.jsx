@@ -33,6 +33,7 @@ function AdminDashboard() {
   const reservationsByBook = reservations.reduce((acc, pb) => {
     const bookTitle = pb.book?.title || `Book #${pb.book?.id}`;
     if (!acc[bookTitle]) acc[bookTitle] = [];
+    
     acc[bookTitle].push(pb);
     return acc;
   }, {});

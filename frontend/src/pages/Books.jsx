@@ -1,5 +1,4 @@
 // src/pages/Books.jsx
-<<<<<<< HEAD
 import React, { useEffect, useState } from 'react';
 import {
   getBooks, addBook, updateBook, deleteBook, searchBooks,
@@ -14,42 +13,20 @@ function Books() {
   const [success,    setSuccess]    = useState('');
 
   // Add/Edit modal
-=======
-// FIX: Added "Copies" management per book.
-// Root cause of "No available copy" — users were adding books but never
-// adding physical copies. Now each book row has a 📋 Copies button.
-import React, { useEffect, useState } from 'react';
-import { getBooks, addBook, updateBook, deleteBook, searchBooks, getBookCopies, addBookCopy } from '../services/api';
-
-function Books() {
-  const [books,    setBooks]    = useState([]);
-  const [search,   setSearch]   = useState('');
-  const [error,    setError]    = useState('');
-  const [success,  setSuccess]  = useState('');
-
-  // Add/Edit book modal
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
   const [showForm, setShowForm] = useState(false);
   const [editBook, setEditBook] = useState(null);
   const emptyForm = { title: '', author: '', isbn: '', genre: '', publisher: '', publishedYear: '', description: '', restrictedFromRemoval: false, inLibraryHoursLimit: 0 };
   const [form, setForm] = useState(emptyForm);
 
   // Copies modal
-<<<<<<< HEAD
   const [copiesBook, setCopiesBook] = useState(null);
   const [copies,     setCopies]     = useState([]);
   const [showCopies, setShowCopies] = useState(false);
-=======
-  const [copiesBook,  setCopiesBook]  = useState(null); // which book's copies we're managing
-  const [copies,      setCopies]      = useState([]);
-  const [showCopies,  setShowCopies]  = useState(false);
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
 
   useEffect(() => { loadBooks(); }, []);
 
   const loadBooks = () => {
     setError('');
-<<<<<<< HEAD
     getBooks().then(res => {
       const bookList = res.data;
       setBooks(bookList);
@@ -62,9 +39,6 @@ function Books() {
         setBookCopies(map);
       });
     }).catch(() => setError('Failed to load books.'));
-=======
-    getBooks().then(res => setBooks(res.data)).catch(() => setError('Failed to load books.'));
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
   };
 
   const handleSearch = () => {
@@ -72,14 +46,8 @@ function Books() {
     searchBooks({ title: search }).then(res => setBooks(res.data)).catch(() => setError('Search failed.'));
   };
 
-<<<<<<< HEAD
   // ── Add / Edit ──────────────────────────────────────────────────
   const openAdd  = () => { setEditBook(null); setForm(emptyForm); setShowForm(true); };
-=======
-  // ── Add / Edit ─────────────────────────────────────────────
-  const openAdd = () => { setEditBook(null); setForm(emptyForm); setShowForm(true); };
-
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
   const openEdit = (book) => { setEditBook(book); setForm({ ...book }); setShowForm(true); };
 
   const handleSubmit = (e) => {
@@ -89,18 +57,13 @@ function Books() {
       .then(() => {
         setShowForm(false);
         loadBooks();
-<<<<<<< HEAD
         setSuccess(editBook ? '✅ Book updated.' : '✅ Book added. Click 📋 Copies to add physical copies.');
-=======
-        setSuccess(editBook ? '✅ Book updated.' : '✅ Book added. Now click 📋 Copies to add physical copies so it can be borrowed.');
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
         setTimeout(() => setSuccess(''), 6000);
       })
       .catch(err => setError(err.response?.data || 'Save failed.'));
   };
 
   const handleDelete = (id) => {
-<<<<<<< HEAD
     if (!window.confirm('Delete this book and ALL its copies?')) return;
     setError('');
     deleteBook(id)
@@ -109,15 +72,6 @@ function Books() {
   };
 
   // ── Copies modal ────────────────────────────────────────────────
-=======
-    if (!window.confirm('Delete this book and all its copies?')) return;
-    setError('');
-    deleteBook(id).then(() => { loadBooks(); setSuccess('✅ Book deleted.'); setTimeout(() => setSuccess(''), 3000); })
-      .catch(err => setError(err.response?.data || 'Delete failed.'));
-  };
-
-  // ── Copies management ──────────────────────────────────────
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
   const openCopies = (book) => {
     setCopiesBook(book);
     setShowCopies(true);
@@ -125,7 +79,6 @@ function Books() {
   };
 
   const handleAddCopy = () => {
-<<<<<<< HEAD
     addBookCopy(copiesBook.id, {})
       .then(res => {
         setCopies(prev => [...prev, res.data]);
@@ -134,19 +87,12 @@ function Books() {
           ...prev,
           [copiesBook.id]: [...(prev[copiesBook.id] || []), res.data]
         }));
-=======
-    // Send empty object — backend auto-generates copyCode and sets status=AVAILABLE
-    addBookCopy(copiesBook.id, {})
-      .then(res => {
-        setCopies(prev => [...prev, res.data]);
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
         setSuccess(`✅ Copy "${res.data.copyCode}" added — status: AVAILABLE`);
         setTimeout(() => setSuccess(''), 3000);
       })
       .catch(err => setError(err.response?.data || 'Failed to add copy.'));
   };
 
-<<<<<<< HEAD
   const handleDeleteCopy = (copyId, copyCode) => {
     if (!window.confirm(`Delete copy "${copyCode}"? This cannot be undone.`)) return;
     deleteBookCopy(copyId)
@@ -165,14 +111,11 @@ function Books() {
   };
 
   // ── Helpers ─────────────────────────────────────────────────────
-=======
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
   const statusBadge = (s) => {
     const map = { AVAILABLE: 'badge-green', BORROWED: 'badge-yellow', RESERVED: 'badge-blue', LOST: 'badge-red', DAMAGED: 'badge-red' };
     return <span className={`badge ${map[s] || 'badge-gray'}`}>{s}</span>;
   };
 
-<<<<<<< HEAD
   const getCopyStats = (bookId) => {
     const c = bookCopies[bookId] || [];
     return {
@@ -191,10 +134,6 @@ function Books() {
     total:     copies.length,
   };
 
-=======
-  const f = (field) => (e) => setForm({ ...form, [field]: e.target.value });
-
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
   return (
     <div>
       <h1 className="page-title">📖 Books</h1>
@@ -211,11 +150,7 @@ function Books() {
         <button className="btn btn-success" onClick={openAdd}>+ Add Book</button>
       </div>
 
-<<<<<<< HEAD
       {/* Tip */}
-=======
-      {/* Info tip */}
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
       <div style={{ background: '#ebf8ff', border: '1px solid #bee3f8', borderRadius: '8px',
                     padding: '12px 16px', marginBottom: '16px', color: '#2c5282', fontSize: '0.9rem' }}>
         💡 <strong>Tip:</strong> After adding a book, click <strong>📋 Copies</strong> to add physical copies.
@@ -233,17 +168,13 @@ function Books() {
               <th>Genre</th>
               <th>Year</th>
               <th>Type</th>
-<<<<<<< HEAD
               <th style={{ textAlign: 'center', color: '#276749' }}>✅ Available</th>
               <th style={{ textAlign: 'center', color: '#92400e' }}>📤 Borrowed</th>
               <th style={{ textAlign: 'center', color: '#2c5282' }}>📚 Total</th>
-=======
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-<<<<<<< HEAD
             {books.map(b => {
               const stats = getCopyStats(b.id);
               return (
@@ -282,35 +213,6 @@ function Books() {
             })}
             {books.length === 0 && (
               <tr><td colSpan={10} style={{ textAlign: 'center', color: '#718096', padding: '24px' }}>
-=======
-            {books.map(b => (
-              <tr key={b.id}>
-                <td>{b.id}</td>
-                <td><strong>{b.title}</strong></td>
-                <td>{b.author}</td>
-                <td>{b.genre || '—'}</td>
-                <td>{b.publishedYear || '—'}</td>
-                <td>
-                  {b.restrictedFromRemoval
-                    ? <span className="badge badge-red">In-Library Only</span>
-                    : <span className="badge badge-green">Can Borrow</span>}
-                </td>
-                <td style={{ whiteSpace: 'nowrap' }}>
-                  <button className="btn btn-primary btn-sm" onClick={() => openEdit(b)}>Edit</button>
-                  {' '}
-                  <button className="btn btn-sm" style={{ background: '#805ad5', color: 'white' }}
-                    onClick={() => openCopies(b)}
-                    title="Add/view physical copies (required before borrowing)">
-                    📋 Copies
-                  </button>
-                  {' '}
-                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(b.id)}>Delete</button>
-                </td>
-              </tr>
-            ))}
-            {books.length === 0 && (
-              <tr><td colSpan={7} style={{ textAlign: 'center', color: '#718096', padding: '24px' }}>
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
                 No books found.
               </td></tr>
             )}
@@ -382,7 +284,6 @@ function Books() {
       {/* ── Copies Modal ── */}
       {showCopies && copiesBook && (
         <div className="modal-backdrop" onClick={() => setShowCopies(false)}>
-<<<<<<< HEAD
           <div className="modal" style={{ width: '650px' }} onClick={e => e.stopPropagation()}>
             <div className="modal-title">📋 Copies of "{copiesBook.title}"</div>
 
@@ -405,32 +306,16 @@ function Books() {
               </div>
             </div>
 
-=======
-          <div className="modal" style={{ width: '600px' }} onClick={e => e.stopPropagation()}>
-            <div className="modal-title">
-              📋 Copies of "{copiesBook.title}"
-            </div>
-
-            <p style={{ color: '#718096', marginBottom: '16px', fontSize: '0.9rem' }}>
-              Each row below is a unique physical copy. Only <strong>AVAILABLE</strong> copies can be borrowed.
-              Click <em>Add Copy</em> to register a new physical copy.
-            </p>
-
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
             {/* Copies table */}
             {copies.length > 0 ? (
               <table style={{ marginBottom: '16px' }}>
                 <thead>
-<<<<<<< HEAD
                   <tr>
                     <th>Copy ID</th>
                     <th>Copy Code</th>
                     <th>Status</th>
                     <th>Action</th>
                   </tr>
-=======
-                  <tr><th>Copy ID</th><th>Copy Code</th><th>Status</th></tr>
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
                 </thead>
                 <tbody>
                   {copies.map(c => (
@@ -438,7 +323,6 @@ function Books() {
                       <td>{c.id}</td>
                       <td><code>{c.copyCode}</code></td>
                       <td>{statusBadge(c.status)}</td>
-<<<<<<< HEAD
                       <td>
                         <button
                           className="btn btn-danger btn-sm"
@@ -449,8 +333,6 @@ function Books() {
                           🗑️ Delete
                         </button>
                       </td>
-=======
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
                     </tr>
                   ))}
                 </tbody>
