@@ -1,17 +1,32 @@
+<<<<<<< HEAD
 // src/pages/Users.jsx  — v2: includes password field for registration
 import React, { useState, useEffect } from 'react';
 import { getStudents, getFaculty, deleteUser, registerStudent, registerFaculty } from '../services/api';
+=======
+// src/pages/Users.jsx
+// FIX: Removed password field — not needed for library management demo.
+import React, { useState, useEffect } from 'react';
+import { getStudents, getFaculty, addStudent, addFaculty, deleteUser } from '../services/api';
+>>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
 
 function Users() {
   const [students, setStudents] = useState([]);
   const [faculty,  setFaculty]  = useState([]);
   const [tab,      setTab]      = useState('students');
   const [showForm, setShowForm] = useState(false);
+<<<<<<< HEAD
   const [showPwd,  setShowPwd]  = useState(false);
   const [msg,      setMsg]      = useState({ text: '', type: '' });
 
   const emptyStudent = { name: '', email: '', phone: '', password: '', studentId: '', department: '', semester: 1 };
   const emptyFaculty = { name: '', email: '', phone: '', password: '', employeeId: '', department: '', designation: '' };
+=======
+  const [msg,      setMsg]      = useState({ text: '', type: '' });
+
+  // FIX: no 'password' field
+  const emptyStudent = { name: '', email: '', phone: '', studentId: '', department: '', semester: 1 };
+  const emptyFaculty = { name: '', email: '', phone: '', employeeId: '', department: '', designation: '' };
+>>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
   const [form, setForm] = useState(emptyStudent);
 
   useEffect(() => { loadData(); }, []);
@@ -24,22 +39,33 @@ function Users() {
   const openAdd = () => {
     setForm(tab === 'students' ? emptyStudent : emptyFaculty);
     setMsg({ text: '', type: '' });
+<<<<<<< HEAD
     setShowPwd(false);
+=======
+>>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
     setShowForm(true);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+<<<<<<< HEAD
     if (!form.password || form.password.length < 6) {
       setMsg({ text: 'Password must be at least 6 characters.', type: 'error' });
       return;
     }
     const action = tab === 'students' ? registerStudent(form) : registerFaculty(form);
+=======
+    const action = tab === 'students' ? addStudent(form) : addFaculty(form);
+>>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
     action
       .then(() => {
         setShowForm(false);
         loadData();
+<<<<<<< HEAD
         setMsg({ text: `✅ ${tab === 'students' ? 'Student' : 'Faculty'} added successfully!`, type: 'success' });
+=======
+        setMsg({ text: '✅ User added successfully!', type: 'success' });
+>>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
       })
       .catch(err => setMsg({ text: err.response?.data || 'Error adding user.', type: 'error' }));
   };
@@ -65,12 +91,22 @@ function Users() {
 
       {/* Tab buttons */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+<<<<<<< HEAD
         <button className={`btn ${tab === 'students' ? 'btn-primary' : ''}`}
+=======
+        <button
+          className={`btn ${tab === 'students' ? 'btn-primary' : ''}`}
+>>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
           style={tab !== 'students' ? { background: '#e2e8f0' } : {}}
           onClick={() => setTab('students')}>
           🎓 Students ({students.length})
         </button>
+<<<<<<< HEAD
         <button className={`btn ${tab === 'faculty' ? 'btn-primary' : ''}`}
+=======
+        <button
+          className={`btn ${tab === 'faculty' ? 'btn-primary' : ''}`}
+>>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
           style={tab !== 'faculty' ? { background: '#e2e8f0' } : {}}
           onClick={() => setTab('faculty')}>
           👨‍🏫 Faculty ({faculty.length})
@@ -108,9 +144,17 @@ function Users() {
               </tr>
             ))}
             {(tab === 'students' ? students : faculty).length === 0 && (
+<<<<<<< HEAD
               <tr><td colSpan={8} style={{ textAlign: 'center', color: '#718096', padding: '24px' }}>
                 No {tab} added yet.
               </td></tr>
+=======
+              <tr>
+                <td colSpan={8} style={{ textAlign: 'center', color: '#718096', padding: '24px' }}>
+                  No {tab} added yet.
+                </td>
+              </tr>
+>>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
             )}
           </tbody>
         </table>
@@ -124,10 +168,13 @@ function Users() {
               Add {tab === 'students' ? '🎓 Student' : '👨‍🏫 Faculty'}
             </div>
 
+<<<<<<< HEAD
             {msg.text && msg.type === 'error' && (
               <div className="alert alert-error" style={{ marginBottom: '12px' }}>{msg.text}</div>
             )}
 
+=======
+>>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
             <form onSubmit={handleSubmit}>
               <div className="form-row">
                 <div className="form-group">
@@ -146,6 +193,7 @@ function Users() {
                   <input value={form.phone || ''} onChange={f('phone')} placeholder="e.g. 9876543210" />
                 </div>
                 <div className="form-group">
+<<<<<<< HEAD
                   <label>Password * <span style={{ color: '#718096', fontWeight: 400, fontSize: '0.8rem' }}>(min 6 chars)</span></label>
                   <div style={{ position: 'relative' }}>
                     <input required type={showPwd ? 'text' : 'password'}
@@ -167,15 +215,36 @@ function Users() {
                   <input value={form.department || ''} onChange={f('department')} placeholder="e.g. Computer Science" />
                 </div>
                 {tab === 'students' ? (
+=======
+                  <label>Department</label>
+                  <input value={form.department || ''} onChange={f('department')} placeholder="e.g. Computer Science" />
+                </div>
+              </div>
+
+              {tab === 'students' ? (
+                <div className="form-row">
+>>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
                   <div className="form-group">
                     <label>Student ID *</label>
                     <input required value={form.studentId || ''} onChange={f('studentId')} placeholder="e.g. STU2024001" />
                   </div>
+<<<<<<< HEAD
                 ) : (
+=======
+                  <div className="form-group">
+                    <label>Semester (1–8)</label>
+                    <input type="number" min="1" max="8" value={form.semester || 1}
+                      onChange={e => setForm({ ...form, semester: parseInt(e.target.value) })} />
+                  </div>
+                </div>
+              ) : (
+                <div className="form-row">
+>>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
                   <div className="form-group">
                     <label>Employee ID *</label>
                     <input required value={form.employeeId || ''} onChange={f('employeeId')} placeholder="e.g. FAC2024001" />
                   </div>
+<<<<<<< HEAD
                 )}
               </div>
 
@@ -189,6 +258,12 @@ function Users() {
                 <div className="form-group">
                   <label>Designation</label>
                   <input value={form.designation || ''} onChange={f('designation')} placeholder="e.g. Associate Professor" />
+=======
+                  <div className="form-group">
+                    <label>Designation</label>
+                    <input value={form.designation || ''} onChange={f('designation')} placeholder="e.g. Professor" />
+                  </div>
+>>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
                 </div>
               )}
 
