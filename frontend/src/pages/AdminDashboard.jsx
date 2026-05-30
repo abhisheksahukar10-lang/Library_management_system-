@@ -1,5 +1,4 @@
 // src/pages/AdminDashboard.jsx
-<<<<<<< HEAD
 import React, { useEffect, useState, useCallback } from 'react';
 import { getBooks, getStudents, getFaculty, getOverdue, getAllPendingPreborrows, adminApprovePreborrow } from '../services/api';
 
@@ -23,27 +22,11 @@ function AdminDashboard() {
         });
         setOverdueList(o.data.slice(0, 8));
         setReservations(r.data);
-=======
-import React, { useEffect, useState } from 'react';
-import { getBooks, getStudents, getFaculty, getOverdue } from '../services/api';
-
-function AdminDashboard() {
-  const [stats,   setStats]   = useState({ books: 0, students: 0, faculty: 0, overdue: 0 });
-  const [overdueList, setOverdueList] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    Promise.all([getBooks(), getStudents(), getFaculty(), getOverdue()])
-      .then(([b, s, f, o]) => {
-        setStats({ books: b.data.length, students: s.data.length, faculty: f.data.length, overdue: o.data.length });
-        setOverdueList(o.data.slice(0, 8)); // show latest 8
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
       })
       .catch(err => console.error('Dashboard load error:', err))
       .finally(() => setLoading(false));
   }, []);
 
-<<<<<<< HEAD
   useEffect(() => { loadDashboard(); }, [loadDashboard]);
 
   // Group pending reservations by book title
@@ -76,19 +59,11 @@ function AdminDashboard() {
   const pendingBookCount = Object.keys(reservationsByBook).length;
   const copyAvailableCount = Object.values(reservationsByBook).filter(hasCopyAvailable).length;
 
-=======
-  if (loading) return <p style={{ color: '#718096' }}>Loading dashboard...</p>;
-
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
   return (
     <div>
       <h1 className="page-title">🔑 Admin Dashboard</h1>
 
-<<<<<<< HEAD
       {/* Row 1 — General stats */}
-=======
-      {/* Stats */}
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-number">{stats.books}</div>
@@ -108,7 +83,6 @@ function AdminDashboard() {
         </div>
       </div>
 
-<<<<<<< HEAD
       {/* ── Reservations Awaiting Admin Approval ─────────────────── */}
       <div className="card" style={{ marginTop: '20px', padding: 0 }}>
         <div style={{
@@ -298,9 +272,6 @@ function AdminDashboard() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginTop: '20px' }}>
-=======
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
         {/* Borrow Policy */}
         <div className="card">
           <h3 style={{ marginBottom: '14px', color: '#2c5282' }}>📋 Borrow Policies</h3>
@@ -315,11 +286,7 @@ function AdminDashboard() {
           </table>
         </div>
 
-<<<<<<< HEAD
         {/* Quick Actions */}
-=======
-        {/* Quick links */}
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
         <div className="card">
           <h3 style={{ marginBottom: '14px', color: '#2c5282' }}>⚡ Quick Actions</h3>
           <ul style={{ paddingLeft: '20px', lineHeight: '2.2' }}>
@@ -334,11 +301,7 @@ function AdminDashboard() {
 
       {/* Overdue List */}
       {overdueList.length > 0 && (
-<<<<<<< HEAD
         <div className="card" style={{ padding: 0, marginTop: '20px' }}>
-=======
-        <div className="card" style={{ padding: 0 }}>
->>>>>>> 60faa2c4c152355fe3b9d243f7e2a2107b30455d
           <div style={{ padding: '14px 20px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ background: '#fed7d7', color: '#c53030', padding: '4px 12px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 600 }}>
               ⚠️ {stats.overdue} Overdue
